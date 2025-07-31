@@ -30,6 +30,9 @@
                     <a href="#tactics" class="nav-link">Tactics</a>
                 </li>
                 <li class="nav-item">
+                    <a href="#videos" class="nav-link">Videos</a>
+                </li>
+                <li class="nav-item">
                     <a href="#schedule" class="nav-link">Schedule</a>
                 </li>
                 <li class="nav-item">
@@ -333,6 +336,215 @@
         </div>
     </section>
 
+    <!-- Videos Section -->
+    <section id="videos" class="videos-section">
+        <div class="container">
+            <h2 class="section-title">Game Videos & Analysis</h2>
+            <p class="section-subtitle">Upload, watch, and analyze game footage with your team</p>
+            
+            <!-- Video Upload Area -->
+            <div class="video-upload-area">
+                <div class="upload-container">
+                    <div class="upload-box" id="upload-box">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Upload Game Video</h3>
+                        <p>Drag and drop your video file here or click to browse</p>
+                        <input type="file" id="video-upload" accept="video/*" multiple>
+                        <button class="upload-btn" onclick="document.getElementById('video-upload').click()">
+                            Choose Video Files
+                        </button>
+                    </div>
+                    <div class="upload-progress" id="upload-progress" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                        <p class="progress-text">Uploading... <span id="progress-percent">0%</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Video Filters -->
+            <div class="video-filters">
+                <div class="filter-group">
+                    <label for="category-filter">Category:</label>
+                    <select id="category-filter">
+                        <option value="all">All Videos</option>
+                        <option value="games">Game Footage</option>
+                        <option value="practice">Practice Sessions</option>
+                        <option value="analysis">Tactical Analysis</option>
+                        <option value="highlights">Highlights</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="date-filter">Date:</label>
+                    <select id="date-filter">
+                        <option value="all">All Time</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="season">This Season</option>
+                    </select>
+                </div>
+                <div class="search-group">
+                    <input type="text" id="video-search" placeholder="Search videos...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            
+            <!-- Video Grid -->
+            <div class="video-grid" id="video-grid">
+                <!-- Sample Videos -->
+                <div class="video-card" data-category="games" data-date="2024-12-01">
+                    <div class="video-thumbnail">
+                        <img src="https://via.placeholder.com/300x200/0066cc/ffffff?text=Game+vs+Thunder+Sharks" alt="Game vs Thunder Sharks">
+                        <div class="video-overlay">
+                            <i class="fas fa-play"></i>
+                            <span class="video-duration">15:32</span>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3>Game vs Thunder Sharks - Dec 1, 2024</h3>
+                        <p class="video-description">Full game footage from our victory against Thunder Sharks. Great defensive plays and offensive execution.</p>
+                        <div class="video-meta">
+                            <span class="video-category">Game Footage</span>
+                            <span class="video-date">Dec 1, 2024</span>
+                        </div>
+                        <div class="video-stats">
+                            <span><i class="fas fa-eye"></i> 24 views</span>
+                            <span><i class="fas fa-comment"></i> 8 comments</span>
+                        </div>
+                    </div>
+                    <div class="video-actions">
+                        <button class="action-btn watch-btn" onclick="openVideoModal('game-vs-thunder-sharks')">
+                            <i class="fas fa-play"></i> Watch
+                        </button>
+                        <button class="action-btn comment-btn" onclick="openComments('game-vs-thunder-sharks')">
+                            <i class="fas fa-comment"></i> Comments
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="video-card" data-category="practice" data-date="2024-11-28">
+                    <div class="video-thumbnail">
+                        <img src="https://via.placeholder.com/300x200/00ccff/ffffff?text=Practice+Session" alt="Practice Session">
+                        <div class="video-overlay">
+                            <i class="fas fa-play"></i>
+                            <span class="video-duration">08:45</span>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3>Practice Session - Offensive Drills</h3>
+                        <p class="video-description">Focus on offensive positioning and shooting accuracy. Coach Michael's tactical insights included.</p>
+                        <div class="video-meta">
+                            <span class="video-category">Practice Sessions</span>
+                            <span class="video-date">Nov 28, 2024</span>
+                        </div>
+                        <div class="video-stats">
+                            <span><i class="fas fa-eye"></i> 18 views</span>
+                            <span><i class="fas fa-comment"></i> 5 comments</span>
+                        </div>
+                    </div>
+                    <div class="video-actions">
+                        <button class="action-btn watch-btn" onclick="openVideoModal('practice-session')">
+                            <i class="fas fa-play"></i> Watch
+                        </button>
+                        <button class="action-btn comment-btn" onclick="openComments('practice-session')">
+                            <i class="fas fa-comment"></i> Comments
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="video-card" data-category="analysis" data-date="2024-11-25">
+                    <div class="video-thumbnail">
+                        <img src="https://via.placeholder.com/300x200/ffd700/333333?text=Tactical+Analysis" alt="Tactical Analysis">
+                        <div class="video-overlay">
+                            <i class="fas fa-play"></i>
+                            <span class="video-duration">12:18</span>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3>Tactical Analysis - Defensive Formation</h3>
+                        <p class="video-description">Breakdown of our defensive strategies and positioning. Key moments and improvement areas highlighted.</p>
+                        <div class="video-meta">
+                            <span class="video-category">Tactical Analysis</span>
+                            <span class="video-date">Nov 25, 2024</span>
+                        </div>
+                        <div class="video-stats">
+                            <span><i class="fas fa-eye"></i> 31 views</span>
+                            <span><i class="fas fa-comment"></i> 12 comments</span>
+                        </div>
+                    </div>
+                    <div class="video-actions">
+                        <button class="action-btn watch-btn" onclick="openVideoModal('tactical-analysis')">
+                            <i class="fas fa-play"></i> Watch
+                        </button>
+                        <button class="action-btn comment-btn" onclick="openComments('tactical-analysis')">
+                            <i class="fas fa-comment"></i> Comments
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Video Modal -->
+    <div class="video-modal" id="video-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Video Title</h3>
+                <button class="close-btn" onclick="closeVideoModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="video-player">
+                    <video id="modal-video" controls>
+                        <source src="" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="video-details">
+                    <p id="modal-description">Video description will appear here.</p>
+                    <div class="video-tags">
+                        <span class="tag">Water Polo</span>
+                        <span class="tag">Game Analysis</span>
+                        <span class="tag">Team Tactics</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Comments Modal -->
+    <div class="comments-modal" id="comments-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Comments & Discussion</h3>
+                <button class="close-btn" onclick="closeComments()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="comments-section">
+                    <div class="comment-form">
+                        <div class="user-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="comment-input-container">
+                            <textarea id="comment-input" placeholder="Add your comment..."></textarea>
+                            <button class="comment-submit" onclick="addComment()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="comments-list" id="comments-list">
+                        <!-- Comments will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Schedule Section -->
     <section id="schedule" class="schedule-section">
         <div class="container">
@@ -503,6 +715,7 @@
                         <li><a href="#team">Team</a></li>
                         <li><a href="#coaches">Coaches</a></li>
                         <li><a href="#tactics">Tactics</a></li>
+                        <li><a href="#videos">Videos</a></li>
                         <li><a href="#schedule">Schedule</a></li>
                         <li><a href="#gallery">Gallery</a></li>
                         <li><a href="#contact">Contact</a></li>

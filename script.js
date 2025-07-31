@@ -500,4 +500,437 @@ function saveFormation() {
         saveBtn.style.background = '';
         saveBtn.style.borderColor = '';
     }, 2000);
-} 
+}
+
+// Video Section Functionality
+document.addEventListener('DOMContentLoaded', () => {
+    initializeVideoSection();
+});
+
+function initializeVideoSection() {
+    const uploadBox = document.getElementById('upload-box');
+    const videoUpload = document.getElementById('video-upload');
+    const categoryFilter = document.getElementById('category-filter');
+    const dateFilter = document.getElementById('date-filter');
+    const searchInput = document.getElementById('video-search');
+    const videoGrid = document.getElementById('video-grid');
+    
+    // Video upload functionality
+    uploadBox.addEventListener('click', () => {
+        videoUpload.click();
+    });
+    
+    uploadBox.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadBox.classList.add('dragover');
+    });
+    
+    uploadBox.addEventListener('dragleave', () => {
+        uploadBox.classList.remove('dragover');
+    });
+    
+    uploadBox.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadBox.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        handleVideoUpload(files);
+    });
+    
+    videoUpload.addEventListener('change', (e) => {
+        const files = e.target.files;
+        handleVideoUpload(files);
+    });
+    
+    // Filter functionality
+    categoryFilter.addEventListener('change', filterVideos);
+    dateFilter.addEventListener('change', filterVideos);
+    searchInput.addEventListener('input', filterVideos);
+    
+    // Load sample comments
+    loadSampleComments();
+}
+
+function handleVideoUpload(files) {
+    const uploadProgress = document.getElementById('upload-progress');
+    const progressFill = document.getElementById('progress-fill');
+    const progressPercent = document.getElementById('progress-percent');
+    
+    uploadProgress.style.display = 'block';
+    
+    Array.from(files).forEach((file, index) => {
+        if (file.type.startsWith('video/')) {
+            // Simulate upload progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    // Add video to grid
+                    setTimeout(() => {
+                        addVideoToGrid(file);
+                        uploadProgress.style.display = 'none';
+                        progressFill.style.width = '0%';
+                        progressPercent.textContent = '0%';
+                    }, 500);
+                }
+                
+                progressFill.style.width = progress + '%';
+                progressPercent.textContent = Math.round(progress) + '%';
+            }, 200);
+        }
+    });
+}
+
+function addVideoToGrid(file) {
+    const videoGrid = document.getElementById('video-grid');
+    const videoCard = document.createElement('div');
+    videoCard.className = 'video-card';
+    videoCard.setAttribute('data-category', 'games');
+    videoCard.setAttribute('data-date', new Date().toISOString().split('T')[0]);
+    
+    const fileName = file.name.replace(/\.[^/.]+$/, "");
+    const fileSize = (file.size / (1024 * 1024)).toFixed(1);
+    
+    videoCard.innerHTML = `
+        <div class="video-thumbnail">
+            <img src="https://via.placeholder.com/300x200/0066cc/ffffff?text=${encodeURIComponent(fileName)}" alt="${fileName}">
+            <div class="video-overlay">
+                <i class="fas fa-play"></i>
+                <span class="video-duration">New</span>
+            </div>
+        </div>
+        <div class="video-info">
+            <h3>${fileName}</h3>
+            <p class="video-description">Uploaded video file (${fileSize} MB). Click to watch and add comments.</p>
+            <div class="video-meta">
+                <span class="video-category">Game Footage</span>
+                <span class="video-date">${new Date().toLocaleDateString()}</span>
+            </div>
+            <div class="video-stats">
+                <span><i class="fas fa-eye"></i> 0 views</span>
+                <span><i class="fas fa-comment"></i> 0 comments</span>
+            </div>
+        </div>
+        <div class="video-actions">
+            <button class="action-btn watch-btn" onclick="openVideoModal('${fileName}')">
+                <i class="fas fa-play"></i> Watch
+            </button>
+            <button class="action-btn comment-btn" onclick="openComments('${fileName}')">
+                <i class="fas fa-comment"></i> Comments
+            </button>
+        </div>
+    `;
+    
+    videoGrid.insertBefore(videoCard, videoGrid.firstChild);
+    
+    // Show success message
+    showNotification('Video uploaded successfully!', 'success');
+}
+
+function filterVideos() {
+    const categoryFilter = document.getElementById('category-filter').value;
+    const dateFilter = document.getElementById('date-filter').value;
+    const searchQuery = document.getElementById('video-search').value.toLowerCase();
+    const videoCards = document.querySelectorAll('.video-card');
+    
+    videoCards.forEach(card => {
+        const category = card.getAttribute('data-category');
+        const date = card.getAttribute('data-date');
+        const title = card.querySelector('h3').textContent.toLowerCase();
+        const description = card.querySelector('.video-description').textContent.toLowerCase();
+        
+        let showCard = true;
+        
+        // Category filter
+        if (categoryFilter !== 'all' && category !== categoryFilter) {
+            showCard = false;
+        }
+        
+        // Date filter
+        if (dateFilter !== 'all') {
+            const videoDate = new Date(date);
+            const now = new Date();
+            const diffTime = Math.abs(now - videoDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (dateFilter === 'week' && diffDays > 7) showCard = false;
+            if (dateFilter === 'month' && diffDays > 30) showCard = false;
+            if (dateFilter === 'season' && diffDays > 90) showCard = false;
+        }
+        
+        // Search filter
+        if (searchQuery && !title.includes(searchQuery) && !description.includes(searchQuery)) {
+            showCard = false;
+        }
+        
+        card.style.display = showCard ? 'block' : 'none';
+    });
+}
+
+// Video modal functionality
+function openVideoModal(videoId) {
+    const modal = document.getElementById('video-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalVideo = document.getElementById('modal-video');
+    const modalDescription = document.getElementById('modal-description');
+    
+    // Set modal content based on video ID
+    const videoData = getVideoData(videoId);
+    modalTitle.textContent = videoData.title;
+    modalDescription.textContent = videoData.description;
+    
+    // For demo purposes, use a placeholder video
+    modalVideo.src = 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4';
+    
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeVideoModal() {
+    const modal = document.getElementById('video-modal');
+    const modalVideo = document.getElementById('modal-video');
+    
+    modal.style.display = 'none';
+    modalVideo.pause();
+    modalVideo.src = '';
+    document.body.style.overflow = 'auto';
+}
+
+// Comments functionality
+let currentVideoId = null;
+let comments = {};
+
+function openComments(videoId) {
+    currentVideoId = videoId;
+    const modal = document.getElementById('comments-modal');
+    
+    // Load comments for this video
+    if (!comments[videoId]) {
+        comments[videoId] = [];
+    }
+    
+    displayComments(videoId);
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeComments() {
+    const modal = document.getElementById('comments-modal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    currentVideoId = null;
+}
+
+function addComment() {
+    const commentInput = document.getElementById('comment-input');
+    const comment = commentInput.value.trim();
+    
+    if (!comment || !currentVideoId) return;
+    
+    const newComment = {
+        id: Date.now(),
+        author: getCurrentUser(),
+        text: comment,
+        time: new Date().toISOString(),
+        avatar: getRandomAvatar()
+    };
+    
+    if (!comments[currentVideoId]) {
+        comments[currentVideoId] = [];
+    }
+    
+    comments[currentVideoId].unshift(newComment);
+    displayComments(currentVideoId);
+    commentInput.value = '';
+    
+    // Update comment count
+    updateCommentCount(currentVideoId);
+}
+
+function displayComments(videoId) {
+    const commentsList = document.getElementById('comments-list');
+    const videoComments = comments[videoId] || [];
+    
+    if (videoComments.length === 0) {
+        commentsList.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No comments yet. Be the first to comment!</p>';
+        return;
+    }
+    
+    commentsList.innerHTML = videoComments.map(comment => `
+        <div class="comment">
+            <div class="comment-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="comment-content">
+                <div class="comment-header">
+                    <span class="comment-author">${comment.author}</span>
+                    <span class="comment-time">${formatTime(comment.time)}</span>
+                </div>
+                <div class="comment-text">${comment.text}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function loadSampleComments() {
+    // Load sample comments for demo videos
+    comments['game-vs-thunder-sharks'] = [
+        {
+            id: 1,
+            author: 'Coach Michael',
+            text: 'Great defensive positioning in the second quarter. Sarah, your goalkeeper skills were outstanding!',
+            time: '2024-12-01T15:30:00Z',
+            avatar: 'coach'
+        },
+        {
+            id: 2,
+            author: 'Sarah Chen',
+            text: 'Thanks Coach! I felt really focused during those penalty shots. The team communication was excellent.',
+            time: '2024-12-01T16:45:00Z',
+            avatar: 'player'
+        },
+        {
+            id: 3,
+            author: 'Alex Rodriguez',
+            text: 'Our offensive plays were working perfectly. Mike, that assist at 12:30 was textbook!',
+            time: '2024-12-01T17:20:00Z',
+            avatar: 'player'
+        }
+    ];
+    
+    comments['practice-session'] = [
+        {
+            id: 4,
+            author: 'Coach Sarah',
+            text: 'Excellent work on the shooting drills. Everyone showed improvement in accuracy.',
+            time: '2024-11-28T14:15:00Z',
+            avatar: 'coach'
+        },
+        {
+            id: 5,
+            author: 'David Kim',
+            text: 'The new passing drill really helped with my timing. Can we practice more of those?',
+            time: '2024-11-28T15:00:00Z',
+            avatar: 'player'
+        }
+    ];
+    
+    comments['tactical-analysis'] = [
+        {
+            id: 6,
+            author: 'Coach Michael',
+            text: 'Key defensive moment at 8:45 - notice how we maintained formation under pressure.',
+            time: '2024-11-25T10:30:00Z',
+            avatar: 'coach'
+        },
+        {
+            id: 7,
+            author: 'Emma Davis',
+            text: 'I see what you mean about the positioning. We need to work on our transition speed.',
+            time: '2024-11-25T11:15:00Z',
+            avatar: 'player'
+        },
+        {
+            id: 8,
+            author: 'Lisa Wang',
+            text: 'The counter-attack at 6:20 was perfectly executed. Great teamwork!',
+            time: '2024-11-25T12:00:00Z',
+            avatar: 'player'
+        }
+    ];
+}
+
+function getVideoData(videoId) {
+    const videoData = {
+        'game-vs-thunder-sharks': {
+            title: 'Game vs Thunder Sharks - Dec 1, 2024',
+            description: 'Full game footage from our victory against Thunder Sharks. Great defensive plays and offensive execution.'
+        },
+        'practice-session': {
+            title: 'Practice Session - Offensive Drills',
+            description: 'Focus on offensive positioning and shooting accuracy. Coach Michael\'s tactical insights included.'
+        },
+        'tactical-analysis': {
+            title: 'Tactical Analysis - Defensive Formation',
+            description: 'Breakdown of our defensive strategies and positioning. Key moments and improvement areas highlighted.'
+        }
+    };
+    
+    return videoData[videoId] || {
+        title: videoId,
+        description: 'Video analysis and team discussion.'
+    };
+}
+
+function getCurrentUser() {
+    // In a real app, this would get the logged-in user
+    const users = ['Coach Michael', 'Coach Sarah', 'Alex Rodriguez', 'Sarah Chen', 'Mike Johnson', 'Emma Davis', 'David Kim', 'Lisa Wang'];
+    return users[Math.floor(Math.random() * users.length)];
+}
+
+function getRandomAvatar() {
+    const avatars = ['coach', 'player'];
+    return avatars[Math.floor(Math.random() * avatars.length)];
+}
+
+function formatTime(timeString) {
+    const date = new Date(timeString);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) return '1 day ago';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    return date.toLocaleDateString();
+}
+
+function updateCommentCount(videoId) {
+    const videoCard = document.querySelector(`[onclick*="${videoId}"]`).closest('.video-card');
+    const commentCount = videoCard.querySelector('.video-stats span:last-child');
+    const count = comments[videoId] ? comments[videoId].length : 0;
+    commentCount.innerHTML = `<i class="fas fa-comment"></i> ${count} comments`;
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#28a745' : '#0066cc'};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        z-index: 3000;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+// Add notification animations to CSS
+const notificationStyles = document.createElement('style');
+notificationStyles.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+`;
+document.head.appendChild(notificationStyles); 
