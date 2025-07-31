@@ -56,7 +56,7 @@ const observer = new IntersectionObserver((entries) => {
 
 // Observe elements for animation
 document.addEventListener('DOMContentLoaded', () => {
-    const animatedElements = document.querySelectorAll('.player-card, .game-card, .gallery-item, .contact-item');
+    const animatedElements = document.querySelectorAll('.player-card, .game-card, .gallery-item, .contact-item, .coach-card');
     
     animatedElements.forEach(el => {
         el.style.opacity = '0';
@@ -119,6 +119,29 @@ document.querySelectorAll('.game-card').forEach(card => {
             card.style.transform = 'translateX(5px)';
         }, 150);
     });
+});
+
+// Coach card hover effects
+document.querySelectorAll('.coach-card').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+        card.style.transform = 'translateY(-10px) scale(1.02)';
+    });
+    
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = 'translateY(0) scale(1)';
+    });
+    
+    // Add click effect for coach email
+    const emailLink = card.querySelector('.coach-email');
+    if (emailLink) {
+        emailLink.addEventListener('click', (e) => {
+            // Add a subtle animation
+            emailLink.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                emailLink.style.transform = 'scale(1)';
+            }, 150);
+        });
+    }
 });
 
 // Gallery item click effects

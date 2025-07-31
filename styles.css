@@ -311,6 +311,140 @@ body {
     font-weight: 500;
 }
 
+/* Coaches Section */
+.coaches-section {
+    padding: 100px 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.coaches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2.5rem;
+    margin-top: 3rem;
+}
+
+.coach-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.coach-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #0066cc, #00ccff, #ffd700);
+}
+
+.coach-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+.coach-image {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, #0066cc, #00ccff);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+    box-shadow: 0 10px 25px rgba(0, 102, 204, 0.3);
+}
+
+.coach-info {
+    text-align: center;
+}
+
+.coach-info h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.coach-title {
+    font-size: 1.1rem;
+    color: #0066cc;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.coach-experience {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+
+.coach-bio {
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.coach-bio p {
+    color: #555;
+    font-size: 0.95rem;
+}
+
+.coach-credentials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.credential {
+    background: linear-gradient(135deg, #0066cc, #00ccff);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    box-shadow: 0 3px 10px rgba(0, 102, 204, 0.2);
+}
+
+.coach-contact {
+    margin-top: auto;
+}
+
+.coach-email {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #0066cc;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    background: rgba(0, 102, 204, 0.1);
+}
+
+.coach-email:hover {
+    background: rgba(0, 102, 204, 0.2);
+    transform: translateY(-2px);
+    color: #0052a3;
+}
+
+.coach-email i {
+    font-size: 1rem;
+}
+
 /* Schedule Section */
 .schedule-section {
     padding: 100px 0;
@@ -654,6 +788,15 @@ body {
 
     .gallery-grid {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    
+    .coaches-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .coach-card {
+        padding: 2rem;
     }
 }
 
