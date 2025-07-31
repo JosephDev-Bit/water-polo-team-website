@@ -292,4 +292,212 @@ function throttle(func, limit) {
 // Apply throttling to scroll events
 window.addEventListener('scroll', throttle(() => {
     // Scroll-based animations and effects
-}, 16)); // ~60fps 
+}, 16)); // ~60fps
+
+// Tactics Board Functionality
+document.addEventListener('DOMContentLoaded', () => {
+    initializeTacticsBoard();
+});
+
+function initializeTacticsBoard() {
+    const players = document.querySelectorAll('.player');
+    const formationBtns = document.querySelectorAll('.formation-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const saveBtn = document.getElementById('save-btn');
+    
+    // Formation presets
+    const formations = {
+        offensive: {
+            positions: {
+                '1': { top: '50%', left: '10%', transform: 'translateY(-50%)' },
+                '2': { top: '25%', left: '25%' },
+                '3': { top: '75%', left: '25%' },
+                '4': { top: '50%', left: '45%', transform: 'translateY(-50%)' },
+                '5': { top: '25%', left: '65%' },
+                '6': { top: '75%', left: '65%' },
+                '7': { top: '50%', left: '85%', transform: 'translateY(-50%)' }
+            },
+            description: 'Aggressive offensive formation with players spread across the pool. Center forward positioned for quick shots, wings ready for crosses.',
+            stats: { attack: 9, defense: 6, speed: 8 }
+        },
+        defensive: {
+            positions: {
+                '1': { top: '50%', left: '10%', transform: 'translateY(-50%)' },
+                '2': { top: '20%', left: '35%' },
+                '3': { top: '80%', left: '35%' },
+                '4': { top: '50%', left: '50%', transform: 'translateY(-50%)' },
+                '5': { top: '20%', left: '65%' },
+                '6': { top: '80%', left: '65%' },
+                '7': { top: '50%', left: '80%', transform: 'translateY(-50%)' }
+            },
+            description: 'Defensive formation with players positioned to block shots and prevent counter-attacks. Strong defensive wall in front of goal.',
+            stats: { attack: 5, defense: 9, speed: 7 }
+        },
+        counter: {
+            positions: {
+                '1': { top: '50%', left: '10%', transform: 'translateY(-50%)' },
+                '2': { top: '30%', left: '30%' },
+                '3': { top: '70%', left: '30%' },
+                '4': { top: '50%', left: '40%', transform: 'translateY(-50%)' },
+                '5': { top: '30%', left: '55%' },
+                '6': { top: '70%', left: '55%' },
+                '7': { top: '50%', left: '75%', transform: 'translateY(-50%)' }
+            },
+            description: 'Counter-attack formation with players positioned for quick transitions. Balanced setup for both defense and fast breaks.',
+            stats: { attack: 7, defense: 7, speed: 9 }
+        },
+        press: {
+            positions: {
+                '1': { top: '50%', left: '15%', transform: 'translateY(-50%)' },
+                '2': { top: '15%', left: '40%' },
+                '3': { top: '85%', left: '40%' },
+                '4': { top: '50%', left: '55%', transform: 'translateY(-50%)' },
+                '5': { top: '15%', left: '70%' },
+                '6': { top: '85%', left: '70%' },
+                '7': { top: '50%', left: '90%', transform: 'translateY(-50%)' }
+            },
+            description: 'Full press formation with aggressive positioning. Players apply pressure across the entire pool to force turnovers.',
+            stats: { attack: 8, defense: 8, speed: 6 }
+        }
+    };
+    
+    // Make players draggable
+    players.forEach(player => {
+        player.addEventListener('dragstart', handleDragStart);
+        player.addEventListener('dragend', handleDragEnd);
+    });
+    
+    // Pool field drop zone
+    const poolField = document.querySelector('.pool-field');
+    poolField.addEventListener('dragover', handleDragOver);
+    poolField.addEventListener('drop', handleDrop);
+    
+    // Formation buttons
+    formationBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const formation = btn.dataset.formation;
+            applyFormation(formation, formations[formation]);
+            
+            // Update active button
+            formationBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+    
+    // Control buttons
+    resetBtn.addEventListener('click', () => {
+        applyFormation('offensive', formations.offensive);
+        formationBtns.forEach(b => b.classList.remove('active'));
+        document.querySelector('[data-formation="offensive"]').classList.add('active');
+    });
+    
+    clearBtn.addEventListener('click', () => {
+        players.forEach(player => {
+            player.style.top = '50%';
+            player.style.left = '50%';
+            player.style.transform = 'translate(-50%, -50%)';
+        });
+        updateFormationInfo('Custom Formation', 'Players positioned manually.', { attack: 5, defense: 5, speed: 5 });
+    });
+    
+    saveBtn.addEventListener('click', () => {
+        saveFormation();
+    });
+    
+    // Initialize with offensive formation
+    applyFormation('offensive', formations.offensive);
+}
+
+function handleDragStart(e) {
+    e.target.style.opacity = '0.5';
+    e.dataTransfer.setData('text/plain', e.target.dataset.player);
+}
+
+function handleDragEnd(e) {
+    e.target.style.opacity = '1';
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    const playerNum = e.dataTransfer.getData('text/plain');
+    const player = document.querySelector(`[data-player="${playerNum}"]`);
+    const poolField = document.querySelector('.pool-field');
+    const rect = poolField.getBoundingClientRect();
+    
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    // Convert to percentages
+    const xPercent = (x / rect.width) * 100;
+    const yPercent = (y / rect.height) * 100;
+    
+    // Keep player within bounds
+    const clampedX = Math.max(5, Math.min(95, xPercent));
+    const clampedY = Math.max(5, Math.min(95, yPercent));
+    
+    player.style.left = `${clampedX}%`;
+    player.style.top = `${clampedY}%`;
+    player.style.transform = 'translate(-50%, -50%)';
+    
+    // Update formation info for custom positioning
+    updateFormationInfo('Custom Formation', 'Players positioned manually. Drag players to create your own formation.', { attack: 5, defense: 5, speed: 5 });
+}
+
+function applyFormation(formationName, formation) {
+    const players = document.querySelectorAll('.player');
+    
+    players.forEach(player => {
+        const playerNum = player.dataset.player;
+        const position = formation.positions[playerNum];
+        
+        if (position) {
+            player.style.top = position.top;
+            player.style.left = position.left;
+            player.style.transform = position.transform || 'translate(-50%, -50%)';
+        }
+    });
+    
+    updateFormationInfo(formationName.charAt(0).toUpperCase() + formationName.slice(1) + ' Formation', formation.description, formation.stats);
+}
+
+function updateFormationInfo(title, description, stats) {
+    document.getElementById('formation-desc').textContent = description;
+    document.getElementById('attack-rating').textContent = stats.attack + '/10';
+    document.getElementById('defense-rating').textContent = stats.defense + '/10';
+    document.getElementById('speed-rating').textContent = stats.speed + '/10';
+}
+
+function saveFormation() {
+    const players = document.querySelectorAll('.player');
+    const formation = {};
+    
+    players.forEach(player => {
+        const playerNum = player.dataset.player;
+        formation[playerNum] = {
+            top: player.style.top,
+            left: player.style.left,
+            transform: player.style.transform
+        };
+    });
+    
+    // Save to localStorage
+    localStorage.setItem('savedFormation', JSON.stringify(formation));
+    
+    // Show success message
+    const saveBtn = document.getElementById('save-btn');
+    const originalText = saveBtn.textContent;
+    saveBtn.textContent = 'Saved!';
+    saveBtn.style.background = '#28a745';
+    saveBtn.style.borderColor = '#28a745';
+    
+    setTimeout(() => {
+        saveBtn.textContent = originalText;
+        saveBtn.style.background = '';
+        saveBtn.style.borderColor = '';
+    }, 2000);
+} 
